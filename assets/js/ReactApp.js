@@ -1,7 +1,53 @@
-import React from 'react';
+import React, { Component } from 'react';
+import Button from "./components/Button/index.js"
 
-function ReactApp() {
-    return (
+const DEFAULT_URL = "http://localhost:4000/";
+
+class ReactApp extends Component {
+    constructor(props){
+      super(props);
+      this.state = {
+        message: ""
+      }
+    }
+
+    onButtonPress = buttonId => _ => {
+      const url = new URL(DEFAULT_URL + 'api/fizzbuzz?foo=false&bar=false')
+      switch(buttonId){
+        case 'foobar':
+          url.searchParams.set('foo', 'true');
+          url.searchParams.set('bar', 'true');
+          break;
+        case 'bar':
+          url.searchParams.set('bar', 'true');
+          break;
+        case 'foo':
+          url.searchParams.set('foo', 'true');
+          break;
+      }
+      
+      fetch(url, {
+        method: 'GET',
+        headers: { 'Content-Type': 'application/json' }
+      })
+      .then(this.onSuccess)
+      .catch(this.onFail);
+    }
+
+    onSuccess = response => {
+      response.json().then((responseJson)=>{
+        this.setState({ message: responseJson.message })
+      })
+    }
+
+    onFail = err => {
+      console.log("Error fetching data: ", err)
+    }
+
+    render(){
+      const { message } = this.state;
+
+      return (
         <div className="App">
             <h1>Papa - Fullstack Engineer Takehome Assignment</h1>
             <p>Welcome to the takehome assignment for fullstack engineers at Papa. We hope you have fun doing this assignment!</p>
@@ -40,13 +86,25 @@ function ReactApp() {
 
             <p><strong>UI Buttons:</strong></p>
 
-            <p>Add them here</p>
+            <Button 
+              text="foo" 
+              onPress={this.onButtonPress("foo")} 
+            />
+            <Button 
+              text="bar" 
+              onPress={this.onButtonPress("bar")}
+            />
+            <Button 
+              text="foobar" 
+              onPress={this.onButtonPress("foobar")}
+            />
 
             <p><strong>API request result:</strong></p>
 
-            <p>Render result here</p>
+            <p>{ message || "Render result here" }</p>
         </div>
-    );
+      )
+    }
 }
 
 export default ReactApp;
